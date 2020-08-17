@@ -6,11 +6,11 @@ import {Directive, ElementRef, HostBinding, HostListener, Renderer2} from "@angu
 export class DropdownDirective {
   @HostBinding('class.open') isOpen: boolean = false;
 
-  constructor() {
+  constructor(private elementRef: ElementRef) {
   }
 
-  @HostListener('click') onMouseEnter() {
-    this.isOpen = !this.isOpen;
+  @HostListener('document:click', ['$event']) toggleOpen(event: Event) {
+    this.isOpen = this.elementRef.nativeElement.contains(event.target) ? !this.isOpen : false;
   }
 
 }
