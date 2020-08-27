@@ -12,7 +12,7 @@ export class ShoppingListService {
   startEditing = new Subject<number>();
 
   getIngredients() {
-    return this.ingredients.slice();
+    return this.ingredients.filter(ingredient => ingredient).slice();
   }
 
   addIngredient(ingredient: Ingredient) {
@@ -33,6 +33,11 @@ export class ShoppingListService {
 
   updateIngredient(id: number, ingredient: Ingredient) {
     this.ingredients[id] = ingredient;
+    this.ingredientsChanged.next(this.getIngredients());
+  }
+
+  deleteIngredient(id: number) {
+    this.ingredients.splice(id, 1);
     this.ingredientsChanged.next(this.getIngredients());
   }
 }

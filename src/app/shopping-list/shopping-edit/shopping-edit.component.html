@@ -34,9 +34,19 @@
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <button class="btn btn-success" type="submit" [disabled]="f.invalid">{{ editMode ? 'Save' : 'Add'}}</button>
-          <button class="btn btn-danger" type="button" style="margin: 3px">Delete</button>
-          <button class="btn btn-primary" type="button" (click)="resetForm()">Clear</button>
+          <button
+            class="btn btn-success"
+            type="submit"
+            [disabled]="f.invalid">{{ editMode ? 'Save' : 'Add'}}</button>
+          <button
+            class="btn btn-danger"
+            type="button"
+            (click)="deleteSelectedItem()"
+            *ngIf="editMode">Delete</button>
+          <button
+            class="btn btn-primary"
+            type="button"
+            (click)="resetForm()">Clear</button>
         </div>
       </div>
     </form>
