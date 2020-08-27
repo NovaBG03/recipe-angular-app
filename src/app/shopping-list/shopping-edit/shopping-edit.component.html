@@ -9,7 +9,12 @@
             id="name"
             class="form-control"
             ngModel
-            name="name">
+            name="name"
+            required
+            #name="ngModel">
+          <span *ngIf="name.invalid && name.touched" class="text-danger">
+            Please enter valid name
+          </span>
         </div>
         <div class="col-sm-2 form-group">
           <label for="amount">Amount</label>
@@ -18,12 +23,18 @@
             id="amount"
             class="form-control"
             ngModel
-            name="amount">
+            name="amount"
+            required
+            pattern="^[1-9]+[0-9]*$"
+            #amount="ngModel">
+          <span *ngIf="amount.invalid && amount.touched" class="text-danger">
+            Please enter a positive number
+          </span>
         </div>
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <button class="btn btn-success" type="submit">Add</button>
+          <button class="btn btn-success" type="submit" [disabled]="f.invalid">Add</button>
           <button class="btn btn-danger" type="button" style="margin: 3px">Delete</button>
           <button class="btn btn-primary" type="button">Clear</button>
         </div>
