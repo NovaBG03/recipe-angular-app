@@ -55,4 +55,11 @@ export class RecipeService {
     console.log(this.recipes);
     this.recipesChanged.next(this.getRecipes());
   }
+
+  deleteRecipe(id: number) {
+    this.recipes.splice(id, 1);
+    console.log(id);
+    console.log(this.recipes);
+    this.recipesChanged.next(this.getRecipes())
+  }
 }
