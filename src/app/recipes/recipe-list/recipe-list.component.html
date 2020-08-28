@@ -3,8 +3,8 @@
     <button class="btn btn-success" (click)="onNewRecipe()">New Recipe</button>
   </div>
 </div>
-<div class="row" style="margin-top: 10px" *ngFor="let recipeEl of recipes">
+<div class="row" style="margin-top: 10px" *ngFor="let recipeEl of recipes; let i = index">
   <div class="col-xs-12">
-    <app-recipe-item [recipe]="recipeEl"></app-recipe-item>
+    <app-recipe-item [recipe]="recipeEl" [recipeId]="i"></app-recipe-item>
   </div>
 </div>
