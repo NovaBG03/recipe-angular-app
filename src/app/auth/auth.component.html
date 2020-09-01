@@ -8,7 +8,11 @@
       <label for="password">Password</label>
       <input type="password" id="password" class="form-control">
     </div>
-    <button class="btn btn-primary" type="submit">Sing Up</button> |
-    <button class="btn btn-primary" type="submit">Switch to Login</button>
+    <button class="btn btn-primary" type="submit">{{ isLoginMode ? 'Login' : 'Sing Up' }}</button>
+    <button
+      class="btn btn-primary pull-right"
+      type="button"
+      (click)="onToggleMode()">
+      Switch to {{ !isLoginMode ? 'Login' : 'Sing Up' }}</button>
   </div>
 </div>
