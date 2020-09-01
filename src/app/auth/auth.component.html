@@ -1,18 +1,21 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" class="form-control">
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" class="form-control">
-    </div>
-    <button class="btn btn-primary" type="submit">{{ isLoginMode ? 'Login' : 'Sing Up' }}</button>
-    <button
-      class="btn btn-primary pull-right"
-      type="button"
-      (click)="onToggleMode()">
-      Switch to {{ !isLoginMode ? 'Login' : 'Sing Up' }}</button>
+    <form ngForm #f='ngForm' (ngSubmit)="onSubmit(f)">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" class="form-control" ngModel name="email" required email>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" class="form-control" ngModel="" name="password" required minlength="6">
+      </div>
+      <div>
+        <button class="btn btn-primary" type="submit" [disabled]="f.invalid">{{ isLoginMode ? 'Login' : 'Sing Up' }}</button>
+
+        <button class="btn btn-primary pull-right" type="button" (click)="onToggleMode()">
+          Switch to {{ !isLoginMode ? 'Login' : 'Sing Up' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>
