@@ -10,7 +10,7 @@ import {AuthResponseData, AuthService} from "./auth.service";
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent implements OnInit {
-  isLoginMode = false;
+  isLoginMode = true;
   isLoading = false;
   error: string = null;
 

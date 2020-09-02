@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {catchError} from "rxjs/operators";
 import {throwError} from "rxjs";
 
@@ -17,6 +17,25 @@ export class AuthService {
   constructor(private http: HttpClient) {
   }
 
+  private static handleError(errorRes: HttpErrorResponse) {
+    let errorMessage = "An unknown error occurred!";
+    if (!errorRes.error || !errorRes.error.error) {
+      return throwError(errorMessage);
+    }
+    switch (errorRes.error.error.message) {
+      case 'EMAIL_EXISTS':
+        errorMessage = "Account with this email already exists!";
+        break;
+      case 'EMAIL_NOT_FOUND':
+        errorMessage = "Account with this email does not exists!";
+        break
+      case 'INVALID_PASSWORD':
+        errorMessage = "Wrong password!";
+        break;
+    }
+    return throwError(errorMessage);
+  }
+
   singUp(email: String, password: String) {
     return this.http
       .post<AuthResponseData>(
@@ -26,17 +45,7 @@ export class AuthService {
           password,
           returnSecureToken: true
         })
-      .pipe(catchError(errorRes => {
-        let errorMessage = "An unknown error occurred!";
-        if (!errorRes.error || !errorRes.error.error) {
-          return throwError(errorMessage);
-        }
-        switch (errorRes.error.error.message) {
-          case 'EMAIL_EXISTS':
-            errorMessage = "Account with this email already exists!";
-        }
-        return  throwError(errorMessage);
-      }));
+      .pipe(catchError(AuthService.handleError));
   }
 
   logIn(email: String, password: String) {
@@ -48,6 +57,7 @@ export class AuthService {
           password,
           returnSecureToken: true
         }
-      );
+      )
+      .pipe(catchError(AuthService.handleError));
   }
 }
