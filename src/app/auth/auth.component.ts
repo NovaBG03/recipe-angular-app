@@ -38,9 +38,9 @@ export class AuthComponent implements OnInit {
         .subscribe(data => {
           console.log(data);
           this.isLoading = false;
-        }, error => {
-          console.log(error);
-          this.error = 'An error occurred!';
+        }, errorMessage => {
+          console.log(errorMessage);
+          this.error = errorMessage;
           this.isLoading = false;
         })
     }
