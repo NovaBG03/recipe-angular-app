@@ -1,7 +1,8 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {catchError} from "rxjs/operators";
-import {throwError} from "rxjs";
+import {catchError, tap} from "rxjs/operators";
+import {Subject, throwError} from "rxjs";
+import {User} from "./user.model";
 
 export interface AuthResponseData {
   idToken: string,      //	A Firebase Auth ID token for the newly created user.
@@ -14,10 +15,40 @@ export interface AuthResponseData {
 
 @Injectable({providedIn: "root"})
 export class AuthService {
+  user = new Subject<User>();
+
   constructor(private http: HttpClient) {
   }
 
-  private static handleError(errorRes: HttpErrorResponse) {
+  singUp(email: String, password: String) {
+    return this.http
+      .post<AuthResponseData>(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCdn_hVrnOKHeJD34lgpDURPJ0pUjyJotc',
+        {
+          email,
+          password,
+          returnSecureToken: true
+        })
+      .pipe(catchError(this.handleError));
+  }
+
+  logIn(email: String, password: String) {
+    return this.http
+      .post<AuthResponseData>(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCdn_hVrnOKHeJD34lgpDURPJ0pUjyJotc',
+        {
+          email,
+          password,
+          returnSecureToken: true
+        }
+      )
+      .pipe(catchError(this.handleError),
+        tap(authData => {
+        this.handleAuthentication(authData.email, authData.localId, authData.idToken, +authData.expiresIn);
+      }));
+  }
+
+  private handleError(errorRes: HttpErrorResponse) {
     let errorMessage = "An unknown error occurred!";
     if (!errorRes.error || !errorRes.error.error) {
       return throwError(errorMessage);
@@ -36,28 +67,9 @@ export class AuthService {
     return throwError(errorMessage);
   }
 
-  singUp(email: String, password: String) {
-    return this.http
-      .post<AuthResponseData>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCdn_hVrnOKHeJD34lgpDURPJ0pUjyJotc',
-        {
-          email,
-          password,
-          returnSecureToken: true
-        })
-      .pipe(catchError(AuthService.handleError));
-  }
-
-  logIn(email: String, password: String) {
-    return this.http
-      .post<AuthResponseData>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCdn_hVrnOKHeJD34lgpDURPJ0pUjyJotc',
-        {
-          email,
-          password,
-          returnSecureToken: true
-        }
-      )
-      .pipe(catchError(AuthService.handleError));
+  private handleAuthentication(email: string, userId: string, token: string, expiresIn: number) {
+    const tokenExpirationData = new Date(new Date().getTime() + expiresIn * 1000);
+    const user = new User(email, userId, token, tokenExpirationData);
+    this.user.next(user);
   }
 }
