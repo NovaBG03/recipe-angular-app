@@ -16,6 +16,7 @@ export interface AuthResponseData {
 
 @Injectable({providedIn: "root"})
 export class AuthService {
+  private logOutTimeout: any = null;
   user = new BehaviorSubject<User>(null);
 
   constructor(private http: HttpClient, private router: Router) {
@@ -68,12 +69,25 @@ export class AuthService {
 
     if (user.token) {
       this.user.next(user);
+      this.autoLogOut(new Date(userData._tokenExpirationDate).getTime() - new Date().getTime());
     }
   }
 
   logOut() {
     this.user.next(null);
+    localStorage.removeItem('userData');
     this.router.navigate(['/auth']);
+    if (this.logOutTimeout) {
+      clearTimeout(this.logOutTimeout);
+      this.logOutTimeout = null;
+    }
+  }
+
+  autoLogOut(timeDuration: number) {
+    console.log(timeDuration);
+    this.logOutTimeout = setTimeout(() => {
+      this.logOut();
+    }, timeDuration);
   }
 
   private handleError(errorRes: HttpErrorResponse) {
@@ -99,6 +113,7 @@ export class AuthService {
     const tokenExpirationData = new Date(new Date().getTime() + expiresIn * 1000);
     const user = new User(email, userId, token, tokenExpirationData);
     this.user.next(user);
+    this.autoLogOut(expiresIn * 1000);
     localStorage.setItem('userData', JSON.stringify(user));
   }
 }
