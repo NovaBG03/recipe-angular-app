@@ -3,6 +3,7 @@ import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {catchError, tap} from "rxjs/operators";
 import {BehaviorSubject, throwError} from "rxjs";
 import {User} from "./user.model";
+import {Router} from "@angular/router";
 
 export interface AuthResponseData {
   idToken: string,      //	A Firebase Auth ID token for the newly created user.
@@ -17,7 +18,7 @@ export interface AuthResponseData {
 export class AuthService {
   user = new BehaviorSubject<User>(null);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
   }
 
   singUp(email: String, password: String) {
@@ -49,6 +50,11 @@ export class AuthService {
         tap(authData => {
         this.handleAuthentication(authData.email, authData.localId, authData.idToken, +authData.expiresIn);
       }));
+  }
+
+  logOut() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
   }
 
   private handleError(errorRes: HttpErrorResponse) {
