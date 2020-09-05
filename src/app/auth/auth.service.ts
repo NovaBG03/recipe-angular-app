@@ -48,8 +48,27 @@ export class AuthService {
       )
       .pipe(catchError(this.handleError),
         tap(authData => {
-        this.handleAuthentication(authData.email, authData.localId, authData.idToken, +authData.expiresIn);
-      }));
+          this.handleAuthentication(authData.email, authData.localId, authData.idToken, +authData.expiresIn);
+        }));
+  }
+
+  autoLogIn() {
+    const userData: {
+      email: string,
+      id: string,
+      _token: string,
+      _tokenExpirationDate: string
+    } = JSON.parse(localStorage.getItem('userData'));
+
+    if (!userData) {
+      return;
+    }
+
+    const user = new User(userData.email, userData.id, userData._token, new Date(userData._tokenExpirationDate));
+
+    if (user.token) {
+      this.user.next(user);
+    }
   }
 
   logOut() {
@@ -80,5 +99,6 @@ export class AuthService {
     const tokenExpirationData = new Date(new Date().getTime() + expiresIn * 1000);
     const user = new User(email, userId, token, tokenExpirationData);
     this.user.next(user);
+    localStorage.setItem('userData', JSON.stringify(user));
   }
 }
