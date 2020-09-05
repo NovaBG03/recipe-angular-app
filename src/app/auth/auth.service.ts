@@ -29,7 +29,10 @@ export class AuthService {
           password,
           returnSecureToken: true
         })
-      .pipe(catchError(this.handleError));
+      .pipe(catchError(this.handleError),
+        tap(authData => {
+          this.handleAuthentication(authData.email, authData.localId, authData.idToken, +authData.expiresIn);
+        }));
   }
 
   logIn(email: String, password: String) {
