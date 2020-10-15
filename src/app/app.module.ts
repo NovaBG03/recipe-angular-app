@@ -15,17 +15,14 @@ import {AuthInterceptorService} from "./auth/auth-interceptor.service";
 import {AlertComponent} from './shared/alert/alert.component';
 import {PlaceholderDirective} from './shared/placeholder/placeholder.directive';
 import {RecipesModule} from "./recipes/recipes.module";
+import {SharedModule} from "./shared/shared.module";
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    DropdownDirective,
-    AuthComponent,
-    SpinnerComponent,
-    AlertComponent,
-    PlaceholderDirective
+    AuthComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +30,8 @@ import {RecipesModule} from "./recipes/recipes.module";
     ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
-    RecipesModule
+    RecipesModule,
+    SharedModule
   ],
   providers: [
     ShoppingListService,
