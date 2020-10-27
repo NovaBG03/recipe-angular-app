@@ -4,7 +4,11 @@ import {catchError, tap} from "rxjs/operators";
 import {BehaviorSubject, throwError} from "rxjs";
 import {User} from "./user.model";
 import {Router} from "@angular/router";
+import {Store} from "@ngrx/store";
 import {environment} from "../../environments/environment";
+
+import * as fromApp from "../store/app.reducer";
+import * as AuthActions from "./store/auth.actions";
 
 export interface AuthResponseData {
   idToken: string,      //	A Firebase Auth ID token for the newly created user.
@@ -17,10 +21,10 @@ export interface AuthResponseData {
 
 @Injectable({providedIn: "root"})
 export class AuthService {
-  private logOutTimeout: any = null;
   user = new BehaviorSubject<User>(null);
+  private logOutTimeout: any = null;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private store: Store<fromApp.AppState>) {
   }
 
   singUp(email: String, password: String) {
@@ -69,13 +73,18 @@ export class AuthService {
     const user = new User(userData.email, userData.id, userData._token, new Date(userData._tokenExpirationDate));
 
     if (user.token) {
-      this.user.next(user);
+      this.store.dispatch(new AuthActions.Login({
+        email: user.email,
+        userId: user.id,
+        token: user.token,
+        tokenExpirationData: new Date(userData._tokenExpirationDate)
+      }));
       this.autoLogOut(new Date(userData._tokenExpirationDate).getTime() - new Date().getTime());
     }
   }
 
   logOut() {
-    this.user.next(null);
+    this.store.dispatch(new AuthActions.Logout());
     localStorage.removeItem('userData');
     this.router.navigate(['/auth']);
     if (this.logOutTimeout) {
@@ -113,7 +122,7 @@ export class AuthService {
   private handleAuthentication(email: string, userId: string, token: string, expiresIn: number) {
     const tokenExpirationData = new Date(new Date().getTime() + expiresIn * 1000);
     const user = new User(email, userId, token, tokenExpirationData);
-    this.user.next(user);
+    this.store.dispatch(new AuthActions.Login({email, userId, token, tokenExpirationData}));
     this.autoLogOut(expiresIn * 1000);
     localStorage.setItem('userData', JSON.stringify(user));
   }
